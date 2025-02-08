@@ -8,11 +8,10 @@
 #include "stm32f1xx_ll_utils.h"
 #include "usart.h"
 #include "flash.h"
-#include "protocol.h"
-#include "checksum.h"
+#include "iamboot/protocol.h"
+#include "iamboot/checksum.h"
 #include "error_handlers.h"
 #include "string.h"
-        
 
 led_t led0 = {
     .port = GPIOC,

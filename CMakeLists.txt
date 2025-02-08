@@ -54,8 +54,6 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/core/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ll/inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/protocol
-    ${CMAKE_CURRENT_SOURCE_DIR}/ubx_checksum
 )
 
 # Add you source file
@@ -64,12 +62,10 @@ file(GLOB SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/core/src/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis/src/*.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ll/src/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/protocol/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ubx_checksum/*.c"
 )
 
 
-# Add lincer file
+# Add linker file
 file(GLOB LINKER_SCRIPT "STM32*.ld")
 message(STATUS "Found linker script - ${LINKER_SCRIPT}")
 
@@ -86,9 +82,15 @@ target_include_directories(root INTERFACE ${CMAKE_SOURCE_DIR})
 target_compile_definitions(root INTERFACE ${DEFINES})
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/drivers/led)
+add_subdirectory(${CMAKE_SOURCE_DIR}/iamboot)
+
+target_compile_definitions(iamboot INTERFACE
+    -DIAMBOOT_LOW_LEVEL=1
+)
 
 target_link_libraries(${PROJECT_NAME}.elf
     led_driver
+    iamboot
 )
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
