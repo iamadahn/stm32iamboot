@@ -1,9 +1,9 @@
 #include "rcc.h"
-#include "error_handlers.h"
-#include "stm32f1xx_ll_system.h"
-#include "stm32f1xx_ll_rcc.h"
-#include "stm32f1xx_ll_utils.h"
-#include "stm32f1xx_ll_cortex.h"
+
+#include <stm32f1xx_ll_system.h>
+#include <stm32f1xx_ll_rcc.h>
+#include <stm32f1xx_ll_utils.h>
+#include <stm32f1xx_ll_cortex.h>
 
 void
 rcc_config(void) {
@@ -12,7 +12,7 @@ rcc_config(void) {
 
     /* Veryfing that flash memory latency was set correctly */
     if (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_2) {
-        error_handler();
+        while (1);
     }
 
     /* Enabling HSE crystal/ceramic resonator */

@@ -20,9 +20,7 @@ set(CMAKE_C_STANDARD 11)
 add_compile_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
 add_compile_options(-lc -lm -lnosys -specs=nano.specs -specs=nosys.specs)
-
-# Uncomment to mitigate c++17 absolute addresses warnings
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
+add_compile_options(-Wall)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     message(STATUS "Maximum optimization for speed")
@@ -51,22 +49,25 @@ add_definitions(${DEFINES})
 # Add Include directories
 include_directories(
     ${CMAKE_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/core/inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis/inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ll/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bsp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bsp/cmsis/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bsp/ll/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sys
 )
 
 # Add you source file
 file(GLOB SOURCES
     "*.s"
-    "${CMAKE_CURRENT_SOURCE_DIR}/core/src/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis/src/*.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ll/src/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/bsp/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/bsp/cmsis/src/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/bsp/ll/src/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/sys/*.c"
 )
 
 
 # Add linker file
-file(GLOB LINKER_SCRIPT "STM32*.ld")
+file(GLOB LINKER_SCRIPT "*.ld")
 message(STATUS "Found linker script - ${LINKER_SCRIPT}")
 
 # this options for C++
@@ -77,11 +78,11 @@ add_link_options(-T ${LINKER_SCRIPT})
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 
-add_library(root INTERFACE)
-target_include_directories(root INTERFACE ${CMAKE_SOURCE_DIR})
-target_compile_definitions(root INTERFACE ${DEFINES})
+set(IAMBOOT_LOW_LEVEL "1" CACHE STRING "" FORCE)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/drivers/led)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/led)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/usart)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/flash)
 add_subdirectory(${CMAKE_SOURCE_DIR}/iamboot)
 
 target_compile_definitions(iamboot INTERFACE
@@ -90,6 +91,8 @@ target_compile_definitions(iamboot INTERFACE
 
 target_link_libraries(${PROJECT_NAME}.elf
     led_driver
+    usart_driver
+    flash_driver
     iamboot
 )
 

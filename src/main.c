@@ -2,16 +2,17 @@
 #pragma GCC optimize ("O0")
 
 #include "bsp.h"
-#include "drivers/led/led.h"
 #include "dwt.h"
-#include "stm32f1xx_ll_gpio.h"
-#include "stm32f1xx_ll_utils.h"
-#include "usart.h"
-#include "flash.h"
+#include "drivers/led/led.h"
+#include "drivers/usart/usart.h"
+#include "drivers/flash/flash.h"
 #include "iamboot/protocol.h"
 #include "iamboot/checksum.h"
-#include "error_handlers.h"
-#include "string.h"
+
+#include <stm32f1xx_ll_gpio.h>
+#include <stm32f1xx_ll_utils.h>
+
+#include <string.h>
 
 led_t led0 = {
     .port = GPIOC,
@@ -48,7 +49,7 @@ main(void) {
     for (uint32_t current_packet_number = 0; current_packet_number < number_of_packets; current_packet_number++) {
         usart_blck_receive(&usart, buf, TOTAL_MSG_LENGTH, 1000);
         if (checksum_valid(buf, TOTAL_MSG_LENGTH) != 0) {
-            error_handler();
+            while (1);
         }
 
         uint8_t firmware_bytes[FIRMWARE_BYTES_LENGTH];
@@ -61,7 +62,7 @@ main(void) {
         }
 
         if (ack_send_serial(&usart) != 0) {
-            error_handler();
+            while (1);
         }
     }
 

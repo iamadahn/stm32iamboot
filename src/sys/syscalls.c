@@ -31,7 +31,7 @@ register char* stack_ptr asm("sp");
 caddr_t _sbrk(int incr) {
   extern char end asm("end");
   static char* heap_end;
-  char* prev_heap_end, *min_stack_ptr;
+  char* prev_heap_end;
 
   if (heap_end == 0) {
     heap_end = &end;
@@ -41,7 +41,7 @@ caddr_t _sbrk(int incr) {
 
 #ifdef FreeRTOS
   /* Use the NVIC offset register to locate the main stack pointer. */
-  min_stack_ptr = (char*)(*(unsigned int*) * (unsigned int*)0xE000ED08);
+  char *min_stack_ptr = (char*)(*(unsigned int*) * (unsigned int*)0xE000ED08);
   /* Locate the STACK bottom address */
   min_stack_ptr -= MAX_STACK_SIZE;
 
