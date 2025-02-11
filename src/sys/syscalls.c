@@ -20,10 +20,6 @@
 extern int errno;
 
 #define MAX_STACK_SIZE 0x2000
-
-extern int __io_putchar(int ch) __attribute__((weak));
-extern int __io_getchar(void) __attribute__((weak));
-
 #ifndef FreeRTOS
 register char* stack_ptr asm("sp");
 #endif
@@ -65,38 +61,25 @@ caddr_t _sbrk(int incr) {
  * _gettimeofday primitive (Stub function)
  * */
 int _gettimeofday (struct timeval* tp, struct timezone* tzp) {
-  /* Return fixed data for the timezone.  */
-  if (tzp) {
-    tzp->tz_minuteswest = 0;
-    tzp->tz_dsttime = 0;
-  }
-
-  return 0;
+  return -1;
 }
 void initialise_monitor_handles() {
 }
 
 int _getpid(void) {
-  return 1;
+  return -1;
 }
 
 int _kill(int pid, int sig) {
-  errno = EINVAL;
   return -1;
 }
 
 void _exit (int status) {
-  _kill(status, -1);
   while (1) {}
 }
 
 int _write(int file, char* ptr, int len) {
-  int DataIdx;
-
-  for (DataIdx = 0; DataIdx < len; DataIdx++) {
-    __io_putchar( *ptr++ );
-  }
-  return len;
+  return -1;
 }
 
 int _close(int file) {
@@ -104,8 +87,7 @@ int _close(int file) {
 }
 
 int _fstat(int file, struct stat* st) {
-  st->st_mode = S_IFCHR;
-  return 0;
+  return -1;
 }
 
 int _isatty(int file) {
@@ -117,13 +99,7 @@ int _lseek(int file, int ptr, int dir) {
 }
 
 int _read(int file, char* ptr, int len) {
-  int DataIdx;
-
-  for (DataIdx = 0; DataIdx < len; DataIdx++) {
-    *ptr++ = __io_getchar();
-  }
-
-  return len;
+  return -1;
 }
 
 int _open(char* path, int flags, ...) {

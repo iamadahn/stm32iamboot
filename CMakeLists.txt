@@ -19,7 +19,7 @@ set(CMAKE_C_STANDARD 11)
 
 add_compile_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
-add_compile_options(-lc -lm -lnosys -specs=nano.specs -specs=nosys.specs)
+add_compile_options(-lc -lm -lnosys -specs=nano.specs)
 add_compile_options(-Wall)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
@@ -33,7 +33,7 @@ elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     add_compile_options(-Os)
 else ()
     message(STATUS "Minimal optimization, debug info included")
-    add_compile_options(-Os -g)
+    add_compile_options(-O0)
 endif ()
 
 set(DEFINES
@@ -71,23 +71,17 @@ file(GLOB LINKER_SCRIPT "*.ld")
 message(STATUS "Found linker script - ${LINKER_SCRIPT}")
 
 # this options for C++
-add_link_options(-specs=nano.specs -specs=nosys.specs -lc -lm)
+add_link_options(-specs=nano.specs -lc -lm)
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
 add_link_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT})
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 
-set(IAMBOOT_LOW_LEVEL "1" CACHE STRING "" FORCE)
-
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/led)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/usart)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/flash)
 add_subdirectory(${CMAKE_SOURCE_DIR}/iamboot)
-
-target_compile_definitions(iamboot INTERFACE
-    -DIAMBOOT_LOW_LEVEL=1
-)
 
 target_link_libraries(${PROJECT_NAME}.elf
     led_driver

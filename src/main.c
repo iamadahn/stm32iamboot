@@ -38,10 +38,10 @@ main(void) {
 
     uint8_t buf[TOTAL_MSG_LENGTH];
     uint32_t number_of_packets = 0;
-    while (handshake_receive_serial(&usart, &number_of_packets) != 0) {
+    while (iamboot_handshake_serial_rx(&usart, &number_of_packets, 1000) != 0) {
         ;
     }
-    handshake_send_serial(&usart);
+    iamboot_handshake_serial_tx(&usart, &number_of_packets, 1000);
  
     flash_unlock();
 
@@ -61,7 +61,7 @@ main(void) {
             addr+=2;
         }
 
-        if (ack_send_serial(&usart) != 0) {
+        if (iamboot_ack_serial_tx(&usart) != 0) {
             while (1);
         }
     }
