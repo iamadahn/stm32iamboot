@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.15)
 
 set(SCRS
     ${CMAKE_CURRENT_LIST_DIR}/usart.c
