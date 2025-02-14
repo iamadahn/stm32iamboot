@@ -2,7 +2,6 @@
 #pragma GCC optimize ("O0")
 
 #include "stdint.h"
-#include "stm32f1xx.h"
 #include "flash.h"
 #include "dwt.h"
 
@@ -71,7 +70,7 @@ flash_ready_wait(uint16_t timeout) {
     uint32_t timeout_counter = 0, timeout_usec = timeout * 1000;
     
     while ((FLASH->SR & FLASH_FLAG_BSY) != RESET) {
-        DWT_Delay(1);
+        dwt_delay(1);
         if (++timeout_counter == timeout_usec) {
             return 1;
         }

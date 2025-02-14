@@ -33,7 +33,7 @@ elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     add_compile_options(-Os)
 else ()
     message(STATUS "Minimal optimization, debug info included")
-    add_compile_options(-O0)
+    add_compile_options(-Os)
 endif ()
 
 set(DEFINES
@@ -78,12 +78,14 @@ add_link_options(-T ${LINKER_SCRIPT})
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/gpio)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/led)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/usart)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/flash)
 add_subdirectory(${CMAKE_SOURCE_DIR}/iamboot)
 
 target_link_libraries(${PROJECT_NAME}.elf
+    gpio_driver
     led_driver
     usart_driver
     flash_driver
