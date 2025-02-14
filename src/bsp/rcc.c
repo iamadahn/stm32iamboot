@@ -1,30 +1,22 @@
 #include "rcc.h"
 
-#include <stm32f1xx_ll_system.h>
 #include <stm32f1xx_ll_rcc.h>
 #include <stm32f1xx_ll_utils.h>
 #include <stm32f1xx_ll_cortex.h>
 
 void
 rcc_config(void) {
-    /* Setting flash memory latency */
-    LL_FLASH_SetLatency(LL_FLASH_LATENCY_2);
 
-    /* Veryfing that flash memory latency was set correctly */
-    if (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_2) {
-        while (1);
-    }
+    /* Enabling HSI crystal/ceramic resonator */
+    LL_RCC_HSI_Enable();
 
-    /* Enabling HSE crystal/ceramic resonator */
-    LL_RCC_HSE_Enable();
-
-    /* Waiting for HSE to start */
-    while (LL_RCC_HSE_IsReady() != 1) {
+    /* Waiting for HSI to start */
+    while (LL_RCC_HSI_IsReady() != 1) {
         ;
     }
 
-    /* HSE value is 8 MHz, so we set PPLMul to 9 in order to get 72 MHz on PLLCLK and SYSCLK*/
-    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLL_MUL_9);
+    /* HSE value is 8 MHz, so we set PPLMul to 16 in order to get 64 MHz on PLLCLK and SYSCLK*/
+    LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSI_DIV_2, LL_RCC_PLL_MUL_16);
 
     /* Enabling PLLCLK on System Clock Mux */
     LL_RCC_PLL_Enable();
@@ -34,7 +26,7 @@ rcc_config(void) {
         ;
     }
 
-    /* Setting AHB Prescaler to /1 to get 72 MHz after SYSCLK */
+    /* Setting AHB Prescaler to /1 to get 64 MHz after SYSCLK */
     LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
 
     /* Setting APB1 Prescaler to /2 (36 MHz max) */
@@ -52,11 +44,11 @@ rcc_config(void) {
     }
 
     /* Setting time base source to SysTick */
-    LL_Init1msTick(72000000);
+    LL_Init1msTick(64000000);
 
     /* Configure SysTick clock source */
     LL_SYSTICK_SetClkSource(LL_SYSTICK_CLKSOURCE_HCLK);
 
     /* Setting system core clock to 72 MHz */
-    LL_SetSystemCoreClock(72000000);
+    LL_SetSystemCoreClock(64000000);
 }
