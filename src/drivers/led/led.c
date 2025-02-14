@@ -1,24 +1,22 @@
 #include "led.h"
 
-void
-led_toggle(led_t* led) {
-    if(led->state == 1) {
-        LL_GPIO_ResetOutputPin(led->port, led->pin);
-        led->state = 0;
+void led_toggle(struct led *self)
+{
+    if(self->state) {
+        led_off(self);
     } else {
-        LL_GPIO_SetOutputPin(led->port, led->pin);
-        led->state = 1;
+        led_on(self);
     }
 }
 
-void
-led_on(led_t* led) {
-    LL_GPIO_SetOutputPin(led->port, led->pin);
-    led->state = 1;
+void led_on(struct led *self)
+{
+    LL_GPIO_SetOutputPin(self->port, self->pin);
+    self->state = 1;
 }
 
-void
-led_off(led_t* led) {
-    LL_GPIO_ResetOutputPin(led->port, led->pin);
-    led->state = 0;
+void led_off(struct led *self)
+{
+    LL_GPIO_ResetOutputPin(self->port, self->pin);
+    self->state = 0;
 }
