@@ -1,4 +1,5 @@
 mkdir -p build
 cd build
-cmake .. -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+cmake .. -GNinja -DCMAKE_EXPORT_COMPILE_COMMANDS=1
 cmake --build .
+cmake --build . --target=build_iamboot_app
