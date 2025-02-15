@@ -100,3 +100,11 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
         COMMENT "Building ${HEX_FILE}
 Building ${BIN_FILE}")
+
+add_custom_target(
+    build_iamboot_app
+    COMMAND ${CMAKE_COMMAND} -S ${CMAKE_SOURCE_DIR}/iamboot -B ${CMAKE_BINARY_DIR}/iamboot_app -DBUILD_EXECUTABLE=1 -GNinja
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/iamboot_app
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Building iamboot app..."
+)
