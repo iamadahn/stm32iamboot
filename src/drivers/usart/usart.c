@@ -90,7 +90,7 @@ int8_t usart_block_transmit(struct usart_config *usart, void *data, uint32_t siz
     for (uint32_t i = 0; i < size; i++) {
         while (!LL_USART_IsActiveFlag_TXE(usart->self)) {
             dwt_delay(1);
-            if (timeout_counter > timeout)
+            if (timeout_counter > timeout * 1000)
                 return 1;
             timeout_counter++;
         }
@@ -114,7 +114,7 @@ int8_t usart_block_receive(struct usart_config *usart, void *buf, uint32_t size,
     for (uint32_t i = 0; i < size; i++) {
         while (!LL_USART_IsActiveFlag_RXNE(usart->self)) {
             dwt_delay(1);
-            if (timeout_counter > timeout)
+            if (timeout_counter > timeout * 1000)
                 return 1;
             timeout_counter++;
         }

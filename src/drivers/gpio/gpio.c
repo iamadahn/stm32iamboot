@@ -26,7 +26,7 @@ int8_t gpio_usart_tx_init(GPIO_TypeDef *port, uint32_t pin_number)
     if (gpio_port_clock_enable(port) != 0)
         return -2;
 
-    LL_GPIO_SetPinMode(port, pin_number, LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinMode(port, pin_number, LL_GPIO_MODE_ALTERNATE);
     LL_GPIO_SetPinSpeed(port, pin_number, LL_GPIO_SPEED_FREQ_HIGH);
     LL_GPIO_SetPinOutputType(port, pin_number, LL_GPIO_OUTPUT_PUSHPULL);
     LL_GPIO_SetPinPull(port, pin_number, LL_GPIO_PULL_UP);
@@ -44,6 +44,8 @@ int8_t gpio_usart_rx_init(GPIO_TypeDef *port, uint32_t pin_number)
     
     LL_GPIO_SetPinMode(port, pin_number, LL_GPIO_MODE_FLOATING);
     LL_GPIO_SetPinSpeed(port, pin_number, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetPinOutputType(port, pin_number, LL_GPIO_OUTPUT_OPENDRAIN);
+    LL_GPIO_SetPinPull(port, pin_number, LL_GPIO_PULL_UP);
 
     return 0;
 }
