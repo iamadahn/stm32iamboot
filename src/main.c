@@ -16,6 +16,7 @@
 
 int main(void)
 {
+    __enable_irq();
     /* Perform hardware initialisation */
     bsp_init();  
 
@@ -26,6 +27,8 @@ int main(void)
     };
 
     gpio_output_init(led_heartbeat.port, led_heartbeat.pin);
+    gpio_usart_tx_init(GPIOA, LL_GPIO_PIN_9);
+    gpio_usart_rx_init(GPIOA, LL_GPIO_PIN_10);
 
     struct usart_config usart_dev = {
         .self = USART1,
@@ -35,7 +38,7 @@ int main(void)
         .data_width = LL_USART_DATAWIDTH_8B,
         .parity = LL_USART_PARITY_NONE,
         .stopbits = LL_USART_STOPBITS_1,
-        .async_mode = 0,
+        .async_mode = 1,
         .irq_mode = 0,
     };
     usart_init(&usart_dev);
@@ -51,7 +54,7 @@ int main(void)
  
     flash_unlock();
 
-    uint32_t addr = 0x8000000 + (1024 * 4);
+    uint32_t addr = 0x8000000 + (1024 * 16);
     for (uint32_t current_packet_number = 0; current_packet_number < number_of_packets; current_packet_number++) {
         usart_block_receive(&usart_dev, buf, TOTAL_MSG_LENGTH, 1000);
         if (checksum_valid(buf, TOTAL_MSG_LENGTH) != 0) {
@@ -75,25 +78,20 @@ int main(void)
     flash_lock();
 
 
-    /*
-
-    uint32_t app_start_address = *(uint32_t*)(0x8004000 + 4);
-
     typedef void (*boot_jump)(void);
     boot_jump app_start;
 
     LL_mDelay(100);
     __disable_irq();
 
-    app_start = (boot_jump)app_start_address;
-    __set_MSP(*(uint32_t*) app_start_address - 4);
+    uint32_t *app_start_address = (uint32_t *)0x8004000;
+    app_start = (boot_jump)*(app_start_address + 1);
+    __set_MSP(*app_start_address);
     app_start();
-    
-    */
 
     while (1) {
         led_toggle(&led_heartbeat);
-        LL_mDelay(100);
+        LL_mDelay(500);
     }
 
     return 0;
