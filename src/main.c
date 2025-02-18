@@ -1,6 +1,3 @@
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-
 #include "bsp.h"
 #include "dwt.h"
 #include "drivers/gpio/gpio.h"
@@ -14,9 +11,27 @@
 
 #include <string.h>
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+static void start_application(void);
+
+static void start_application(void)
+{
+    typedef void (*jump)(void);
+    jump jump_to_app;
+
+    LL_mDelay(100);
+    __disable_irq();
+
+    uint32_t *app_address = (uint32_t *)0x8001000;
+    jump_to_app = (jump)*(app_address + 1);
+    __set_MSP(*app_address);
+    jump_to_app();
+}
+#pragma GCC pop_options
+
 int main(void)
 {
-    __enable_irq();
     /* Perform hardware initialisation */
     bsp_init();  
 
@@ -43,18 +58,27 @@ int main(void)
     };
     usart_init(&usart_dev);
 
+
+    int8_t ret = -1;
+    uint32_t number_of_packets = 0;
+    for (uint8_t i = 0; i < 10; i++) {
+        if ((ret = iamboot_handshake_serial_rx(&usart_dev, &number_of_packets, 100)) != 0)  
+            led_toggle(&led_heartbeat);
+        else
+            break;
+    }
+
+    if (ret != 0)
+        start_application();
+
     flash_full_erase();
 
-    uint8_t buf[TOTAL_MSG_LENGTH];
-    uint32_t number_of_packets = 0;
-    while (iamboot_handshake_serial_rx(&usart_dev, &number_of_packets, 100) != 0) {
-        led_toggle(&led_heartbeat);
-    }
     iamboot_handshake_serial_tx(&usart_dev, &number_of_packets, 1000);
  
     flash_unlock();
 
-    uint32_t addr = 0x8000000 + (1024 * 16);
+    uint8_t buf[TOTAL_MSG_LENGTH];
+    uint32_t addr = 0x8000000 + (1024 * 4);
     for (uint32_t current_packet_number = 0; current_packet_number < number_of_packets; current_packet_number++) {
         usart_block_receive(&usart_dev, buf, TOTAL_MSG_LENGTH, 1000);
         if (checksum_valid(buf, TOTAL_MSG_LENGTH) != 0) {
@@ -77,17 +101,9 @@ int main(void)
 
     flash_lock();
 
+    bsp_deinit();
 
-    typedef void (*boot_jump)(void);
-    boot_jump app_start;
-
-    LL_mDelay(100);
-    __disable_irq();
-
-    uint32_t *app_start_address = (uint32_t *)0x8004000;
-    app_start = (boot_jump)*(app_start_address + 1);
-    __set_MSP(*app_start_address);
-    app_start();
+    start_application();
 
     while (1) {
         led_toggle(&led_heartbeat);
@@ -118,4 +134,4 @@ int8_t iamboot_serial_rx(void *pv_arg, void *buf, uint32_t len, uint32_t timeout
     int8_t ret = usart_block_receive(usart_dev, buf, len, timeout_ms);
     return ret;
 }
-#pragma GCC pop_options
+
