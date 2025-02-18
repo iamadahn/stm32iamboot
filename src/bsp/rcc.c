@@ -52,3 +52,22 @@ rcc_config(void) {
     /* Setting system core clock to 72 MHz */
     LL_SetSystemCoreClock(64000000);
 }
+
+void rcc_deinit(void)
+{
+    LL_RCC_PLL_Disable();
+    while (LL_RCC_PLL_IsReady() != 1) {
+        ;
+    }
+
+    // Switch system clock to HSI (8 MHz)
+    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI);  // Wait for HSI
+
+    // Reset all RCC configuration registers to default
+    LL_RCC_DeInit();  // Reset RCC to default state
+
+    // Re-enable HSI (default state after reset)
+    LL_RCC_HSI_Enable();
+    while (!LL_RCC_HSI_IsReady());  // Wait for HSI to stabilize
+}

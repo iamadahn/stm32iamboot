@@ -21,3 +21,9 @@ void bsp_init(void)
 
     dwt_init();
 }
+
+void bsp_deinit(void)
+{
+    rcc_deinit();
+}
+
