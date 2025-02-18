@@ -1,6 +1,3 @@
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-
 #include "stdint.h"
 #include "flash.h"
 #include "dwt.h"
@@ -127,5 +124,3 @@ flash_program(uint32_t addr, uint64_t data) {
 
     return error_status;
 }
-
-#pragma GCC pop_options
