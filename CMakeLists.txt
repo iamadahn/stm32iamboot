@@ -22,26 +22,27 @@ add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-le
 add_compile_options(-lc -lm -lnosys -specs=nano.specs)
 add_compile_options(-Wall)
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-    message(STATUS "Maximum optimization for speed")
-    add_compile_options(-Ofast)
-elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-    message(STATUS "Maximum optimization for speed, debug info included")
-    add_compile_options(-Ofast -g)
-elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-    message(STATUS "Maximum optimization for size")
-    add_compile_options(-Os)
-else ()
-    message(STATUS "Minimal optimization, debug info included")
-    add_compile_options(-O0 -g)
-endif ()
+add_compile_options(-Os)
+
+if (DEFINED FLASH_BOOT_START_ADDR)
+    add_definitions(-DFLASH_BOOT_START_ADDR=${FLASH_BOOT_START_ADDR})
+endif()
+
+if (DEFINED FLASH_APP_START_ADDR)
+    add_definitions(-DFLASH_APP_START_ADDR=${FLASH_APP_START_ADDR})
+endif()
+
+if (DEFINED FLASH_PAGES)
+    add_definitions(-DFLASH_PAGES=${FLASH_PAGES})
+endif()
+
+if (DEFINED FLASH_PAGE_SIZE)
+    add_definitions(-DFLASH_PAGE_SIZE=${FLASH_PAGE_SIZE})
+endif()
 
 set(DEFINES
     -DSTM32F103xB
     -DUSE_FULL_LL_DRIVER
-    -DFLASH_PAGES=128
-    -DFLASH_APP_START_ADDR=0x8000000
-    -DFLASH_PAGE_SIZE=1024
 )
 
 add_definitions(${DEFINES})
