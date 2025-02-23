@@ -98,7 +98,7 @@ flash_page_erase(uint32_t page) {
 
     FLASH->CR |= FLASH_CR_PER;
 
-    FLASH->AR = FLASH_APP_START_ADDR + page * FLASH_PAGE_SIZE;
+    FLASH->AR = FLASH_BOOT_START_ADDR + page * FLASH_PAGE_SIZE;
     FLASH->CR |= FLASH_CR_STRT;
 
     while (flash_is_busy());

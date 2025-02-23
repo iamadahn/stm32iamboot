@@ -23,9 +23,11 @@ static void start_application(void)
     LL_mDelay(100);
     __disable_irq();
 
-    uint32_t *app_address = (uint32_t *)0x8001000;
+    uint32_t *app_address = (uint32_t *)FLASH_APP_START_ADDR;
     jump_to_app = (jump)*(app_address + 1);
     __set_MSP(*app_address);
+    SCB->VTOR = FLASH_APP_START_ADDR;
+    __enable_irq();
     jump_to_app();
 }
 #pragma GCC pop_options
@@ -78,7 +80,7 @@ int main(void)
     flash_unlock();
 
     uint8_t buf[TOTAL_MSG_LENGTH];
-    uint32_t addr = 0x8000000 + (1024 * 4);
+    uint32_t addr = FLASH_BOOT_START_ADDR + (1024 * 4);
     for (uint32_t current_packet_number = 0; current_packet_number < number_of_packets; current_packet_number++) {
         usart_block_receive(&usart_dev, buf, TOTAL_MSG_LENGTH, 1000);
         if (checksum_valid(buf, TOTAL_MSG_LENGTH) != 0) {
