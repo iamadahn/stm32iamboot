@@ -11,26 +11,7 @@
 
 #include <string.h>
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
 static void start_application(void);
-
-static void start_application(void)
-{
-    typedef void (*jump)(void);
-    jump jump_to_app;
-
-    LL_mDelay(100);
-    __disable_irq();
-
-    uint32_t *app_address = (uint32_t *)FLASH_APP_START_ADDR;
-    jump_to_app = (jump)*(app_address + 1);
-    __set_MSP(*app_address);
-    SCB->VTOR = FLASH_APP_START_ADDR;
-    __enable_irq();
-    jump_to_app();
-}
-#pragma GCC pop_options
 
 int main(void)
 {
@@ -44,6 +25,8 @@ int main(void)
     };
 
     gpio_output_init(led_heartbeat.port, led_heartbeat.pin);
+
+#ifdef USE_USART1_PA9_PA10
     gpio_usart_tx_init(GPIOA, LL_GPIO_PIN_9);
     gpio_usart_rx_init(GPIOA, LL_GPIO_PIN_10);
 
@@ -59,7 +42,130 @@ int main(void)
         .irq_mode = 0,
     };
     usart_init(&usart_dev);
+#elif defined USE_USART1_PB6_PB7
+    gpio_usart_tx_init(GPIOB, LL_GPIO_PIN_6);
+    gpio_usart_rx_init(GPIOB, LL_GPIO_PIN_7);
 
+    struct usart_config usart_dev = {
+        .self = USART1,
+        .apb_bus_freq = 64000000,
+        .baudrate = 115200,
+        .transfer_direction = LL_USART_DIRECTION_TX_RX,
+        .data_width = LL_USART_DATAWIDTH_8B,
+        .parity = LL_USART_PARITY_NONE,
+        .stopbits = LL_USART_STOPBITS_1,
+        .async_mode = 1,
+        .irq_mode = 0,
+    };
+    usart_init(&usart_dev);
+#elif defined USE_USART2_PA2_PA3
+    gpio_usart_tx_init(GPIOA, LL_GPIO_PIN_2);
+    gpio_usart_rx_init(GPIOA, LL_GPIO_PIN_3);
+
+    struct usart_config usart_dev = {
+        .self = USART2,
+        .apb_bus_freq = 32000000,
+        .baudrate = 115200,
+        .transfer_direction = LL_USART_DIRECTION_TX_RX,
+        .data_width = LL_USART_DATAWIDTH_8B,
+        .parity = LL_USART_PARITY_NONE,
+        .stopbits = LL_USART_STOPBITS_1,
+        .async_mode = 1,
+        .irq_mode = 0,
+    };
+    usart_init(&usart_dev);
+#elif defined USE_USART2_PD5_PD6
+    gpio_usart_tx_init(GPIOD, LL_GPIO_PIN_5);
+    gpio_usart_rx_init(GPIOD, LL_GPIO_PIN_6);
+
+    struct usart_config usart_dev = {
+        .self = USART2,
+        .apb_bus_freq = 32000000,
+        .baudrate = 115200,
+        .transfer_direction = LL_USART_DIRECTION_TX_RX,
+        .data_width = LL_USART_DATAWIDTH_8B,
+        .parity = LL_USART_PARITY_NONE,
+        .stopbits = LL_USART_STOPBITS_1,
+        .async_mode = 1,
+        .irq_mode = 0,
+    };
+    usart_init(&usart_dev);
+#elif defined USE_USART3_PB10_PB11
+    gpio_usart_tx_init(GPIOB, LL_GPIO_PIN_10);
+    gpio_usart_rx_init(GPIOB, LL_GPIO_PIN_11);
+
+    struct usart_config usart_dev = {
+        .self = USART3,
+        .apb_bus_freq = 32000000,
+        .baudrate = 115200,
+        .transfer_direction = LL_USART_DIRECTION_TX_RX,
+        .data_width = LL_USART_DATAWIDTH_8B,
+        .parity = LL_USART_PARITY_NONE,
+        .stopbits = LL_USART_STOPBITS_1,
+        .async_mode = 1,
+        .irq_mode = 0,
+    };
+    usart_init(&usart_dev);
+#elif defined USE_USART3_PD8_PD9
+    gpio_usart_tx_init(GPIOD, LL_GPIO_PIN_8);
+    gpio_usart_rx_init(GPIOD, LL_GPIO_PIN_9);
+
+    struct usart_config usart_dev = {
+        .self = USART3,
+        .apb_bus_freq = 32000000,
+        .baudrate = 115200,
+        .transfer_direction = LL_USART_DIRECTION_TX_RX,
+        .data_width = LL_USART_DATAWIDTH_8B,
+        .parity = LL_USART_PARITY_NONE,
+        .stopbits = LL_USART_STOPBITS_1,
+        .async_mode = 1,
+        .irq_mode = 0,
+    };
+#elif defined USE_USART3_PC10_PC11
+    gpio_usart_tx_init(GPIOC, LL_GPIO_PIN_10);
+    gpio_usart_rx_init(GPIOC, LL_GPIO_PIN_11);
+
+    struct usart_config usart_dev = {
+        .self = USART3,
+        .apb_bus_freq = 32000000,
+        .baudrate = 115200,
+        .transfer_direction = LL_USART_DIRECTION_TX_RX,
+        .data_width = LL_USART_DATAWIDTH_8B,
+        .parity = LL_USART_PARITY_NONE,
+        .stopbits = LL_USART_STOPBITS_1,
+        .async_mode = 1,
+        .irq_mode = 0,
+    };
+#elif defined USE_UART4_PC10_PC11
+    gpio_usart_tx_init(GPIOC, LL_GPIO_PIN_10);
+    gpio_usart_rx_init(GPIOC, LL_GPIO_PIN_11);
+
+    struct usart_config usart_dev = {
+        .self = UART4,
+        .apb_bus_freq = 32000000,
+        .baudrate = 115200,
+        .transfer_direction = LL_USART_DIRECTION_TX_RX,
+        .data_width = LL_USART_DATAWIDTH_8B,
+        .parity = LL_USART_PARITY_NONE,
+        .stopbits = LL_USART_STOPBITS_1,
+        .async_mode = 1,
+        .irq_mode = 0,
+    };
+#elif defined USE_UART5_PC12_PD2
+    gpio_usart_tx_init(GPIOC, LL_GPIO_PIN_12);
+    gpio_usart_rx_init(GPIOD, LL_GPIO_PIN_2);
+
+    struct usart_config usart_dev = {
+        .self = UART5,
+        .apb_bus_freq = 32000000,
+        .baudrate = 115200,
+        .transfer_direction = LL_USART_DIRECTION_TX_RX,
+        .data_width = LL_USART_DATAWIDTH_8B,
+        .parity = LL_USART_PARITY_NONE,
+        .stopbits = LL_USART_STOPBITS_1,
+        .async_mode = 1,
+        .irq_mode = 0,
+#endif
 
     int8_t ret = -1;
     uint32_t number_of_packets = 0;
@@ -136,4 +242,23 @@ int8_t iamboot_serial_rx(void *pv_arg, void *buf, uint32_t len, uint32_t timeout
     int8_t ret = usart_block_receive(usart_dev, buf, len, timeout_ms);
     return ret;
 }
+
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+static void start_application(void)
+{
+    typedef void (*jump)(void);
+    jump jump_to_app;
+
+    LL_mDelay(100);
+    __disable_irq();
+
+    uint32_t *app_address = (uint32_t *)FLASH_APP_START_ADDR;
+    jump_to_app = (jump)*(app_address + 1);
+    __set_MSP(*app_address);
+    SCB->VTOR = FLASH_APP_START_ADDR;
+    __enable_irq();
+    jump_to_app();
+}
+#pragma GCC pop_options
 
