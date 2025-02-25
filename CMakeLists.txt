@@ -24,28 +24,7 @@ add_compile_options(-Wall)
 
 add_compile_options(-Os)
 
-if (DEFINED FLASH_BOOT_START_ADDR)
-    add_definitions(-DFLASH_BOOT_START_ADDR=${FLASH_BOOT_START_ADDR})
-endif()
-
-if (DEFINED FLASH_APP_START_ADDR)
-    add_definitions(-DFLASH_APP_START_ADDR=${FLASH_APP_START_ADDR})
-endif()
-
-if (DEFINED FLASH_PAGES)
-    add_definitions(-DFLASH_PAGES=${FLASH_PAGES})
-endif()
-
-if (DEFINED FLASH_PAGE_SIZE)
-    add_definitions(-DFLASH_PAGE_SIZE=${FLASH_PAGE_SIZE})
-endif()
-
-set(DEFINES
-    -DSTM32F103xB
-    -DUSE_FULL_LL_DRIVER
-)
-
-add_definitions(${DEFINES})
+get_cmake_property(variables VARIABLES)
 
 # Add Include directories
 include_directories(
@@ -78,6 +57,18 @@ add_link_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT})
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
+
+foreach(variable ${variables})
+    if(variable MATCHES "^FLASH_")
+        target_compile_definitions(${PROJECT_NAME}.elf PRIVATE ${variable}=${${variable}})
+    elseif(variable MATCHES "^STM32")
+        target_compile_definitions(${PROJECT_NAME}.elf PRIVATE ${variable}=${${variable}})
+    elseif(variable MATCHES "^USE")
+        target_compile_definitions(${PROJECT_NAME}.elf PRIVATE ${variable}=${${variable}})
+    endif()
+endforeach()
+
+add_definitions(-DUSE_FULL_LL_DRIVER)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/gpio)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/drivers/led)
